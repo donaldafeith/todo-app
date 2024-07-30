@@ -1,17 +1,30 @@
 <?php
+// Include the database connection file
 include 'db.php';
 
+// Get the ID of the to-do item from the query string
 $id = $_GET['id'];
 
-$sql = "DELETE FROM todos WHERE id=$id";
+// Prepare the SQL statement to prevent SQL injection
+$stmt = $conn->prepare("DELETE FROM todos WHERE id=?");
 
-if ($conn->query($sql) === TRUE) {
+// Bind the ID parameter to the SQL query
+$stmt->bind_param("i", $id);
+
+// Execute the query and check if it was successful
+if ($stmt->execute() === TRUE) {
     echo "Record deleted successfully";
 } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    // Display an error message if the query failed
+    echo "Error: " . $stmt->error;
 }
 
+// Close the prepared statement
+$stmt->close();
+
+// Close the database connection
 $conn->close();
 
+// Redirect to the index page
 header('Location: index.php');
 ?>
